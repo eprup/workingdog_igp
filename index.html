@@ -195,9 +195,7 @@
 
     .slider {
       position: relative;
-      aspect-ratio: 16 / 9;
-      min-height: 320px;
-      max-height: 620px;
+      height: 480px;
       border-radius: 40px;
       overflow: hidden;
       border: 1px solid var(--line);
@@ -207,17 +205,17 @@
 
     .slider-track {
       display: flex;
-      width: 300%;
+      width: 100%;
       height: 100%;
-      transition: transform 0.7s ease;
+      transition: transform 0.6s ease;
       will-change: transform;
     }
 
     .slide {
+      position: relative;
       flex: 0 0 100%;
       width: 100%;
       height: 100%;
-      position: relative;
       overflow: hidden;
       background: linear-gradient(135deg, #d7d2bf, #a69d80 58%, #6f765d);
     }
@@ -235,7 +233,7 @@
       content: "";
       position: absolute;
       inset: 0;
-      background: linear-gradient(180deg, rgba(35, 39, 32, 0.14), rgba(35, 39, 32, 0.34));
+      background: linear-gradient(180deg, rgba(35, 39, 32, 0.10), rgba(35, 39, 32, 0.22));
       pointer-events: none;
     }
 
@@ -574,7 +572,7 @@
         grid-template-columns: 1fr;
       }
 
-      .slider { min-height: 300px; aspect-ratio: 4 / 3; }
+      .slider { height: 380px; }
 
       .nav-links {
         display: none;
@@ -597,7 +595,7 @@
 
     @media (max-width: 640px) {
       .section { padding: 68px 0; }
-      .slider { min-height: 260px; aspect-ratio: 1 / 1; border-radius: 28px; }
+      .slider { height: 280px; border-radius: 28px; }
       .slider-arrow { width: 42px; height: 42px; }
       .slider-arrow.prev { left: 10px; }
       .slider-arrow.next { right: 10px; }
@@ -634,16 +632,15 @@
   <main>
     <section class="hero" id="home">
       <div class="container hero-layout">
+        
         <div class="slider" id="heroSlider">
           <div class="slider-track" id="sliderTrack">
             <div class="slide">
               <img src="images/hero-1.jpg?v=1" alt="Köpek eğitimi görseli 1" />
             </div>
-
             <div class="slide">
               <img src="images/hero-2.jpg?v=2" alt="Köpek eğitimi görseli 2" />
             </div>
-
             <div class="slide">
               <img src="images/hero-3.jpg?v=3" alt="Köpek eğitimi görseli 3" />
             </div>
@@ -686,7 +683,7 @@
         </div>
 
         <div class="about-card">
-          <span class="pill">🤍 Hakkımda</span>
+          <span class="pill">🤍 About / Hakkımda</span>
           <p>
             Her köpek farklı bir karaktere, her ev farklı bir düzene sahip. Bu yüzden tek tip yöntemler yerine,
             köpeğine ve senin günlük hayatına uyan bir sistem kurmaya odaklanıyorum.
@@ -727,14 +724,14 @@
       <div class="container">
         <div class="section-head">
           <div>
-            <span class="pill">🦴 Hizmetler</span>
+            <span class="pill">🦴 Services / Hizmetler</span>
           </div>
         </div>
 
         <div class="services-list">
           <article class="service-card">
             <div class="service-visual">
-              <img src="images/service-1.jpg" alt="Yavru köpek eğitimi" />
+              <img src="images/service-1.jpg"  />
             </div>
             <div>
               <h3>Yavru Köpek Eğitimi</h3>
@@ -745,7 +742,7 @@
 
           <article class="service-card">
             <div class="service-visual">
-              <img src="images/service-2.jpg" alt="Temel itaat eğitimi" />
+              <img src="images/service-2.jpg"  />
             </div>
             <div>
               <h3>Temel İtaat</h3>
@@ -756,7 +753,7 @@
 
           <article class="service-card">
             <div class="service-visual">
-              <img src="images/service-3.jpg" alt="Davranış desteği" />
+              <img src="images/service-3.jpg" />
             </div>
             <div>
               <h3>Davranış Desteği</h3>
@@ -871,6 +868,7 @@
       link.addEventListener('click', () => navLinks.classList.remove('open'));
     });
 
+    
     const sliderTrack = document.getElementById('sliderTrack');
     const slides = Array.from(document.querySelectorAll('.slide'));
     const dots = Array.from(document.querySelectorAll('.slider-dot'));
@@ -881,14 +879,9 @@
     let autoPlay;
 
     function showSlide(index) {
-      const safeIndex = (index + slides.length) % slides.length;
-      sliderTrack.style.transform = `translateX(-${safeIndex * (100 / slides.length)}%)`;
-
-      dots.forEach((dot, i) => {
-        dot.classList.toggle('active', i === safeIndex);
-      });
-
-      currentSlide = safeIndex;
+      currentSlide = (index + slides.length) % slides.length;
+      sliderTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
+      dots.forEach((dot, i) => dot.classList.toggle('active', i === currentSlide));
     }
 
     function nextSlide() {
@@ -901,7 +894,7 @@
 
     function restartAutoPlay() {
       clearInterval(autoPlay);
-      autoPlay = setInterval(nextSlide, 5000);
+      autoPlay = setInterval(nextSlide, 4500);
     }
 
     nextButton.addEventListener('click', () => {
