@@ -195,7 +195,9 @@
 
     .slider {
       position: relative;
-      height: 560px;
+      aspect-ratio: 16 / 9;
+      min-height: 320px;
+      max-height: 620px;
       border-radius: 40px;
       overflow: hidden;
       border: 1px solid var(--line);
@@ -205,17 +207,17 @@
 
     .slider-track {
       display: flex;
-      width: 100%;
+      width: 300%;
       height: 100%;
       transition: transform 0.7s ease;
       will-change: transform;
     }
 
     .slide {
-      position: relative;
       flex: 0 0 100%;
       width: 100%;
       height: 100%;
+      position: relative;
       overflow: hidden;
       background: linear-gradient(135deg, #d7d2bf, #a69d80 58%, #6f765d);
     }
@@ -233,7 +235,7 @@
       content: "";
       position: absolute;
       inset: 0;
-      background: linear-gradient(180deg, rgba(35, 39, 32, 0.10), rgba(35, 39, 32, 0.24));
+      background: linear-gradient(180deg, rgba(35, 39, 32, 0.14), rgba(35, 39, 32, 0.34));
       pointer-events: none;
     }
 
@@ -572,7 +574,7 @@
         grid-template-columns: 1fr;
       }
 
-      .slider { height: 430px; }
+      .slider { min-height: 300px; aspect-ratio: 4 / 3; }
 
       .nav-links {
         display: none;
@@ -595,7 +597,7 @@
 
     @media (max-width: 640px) {
       .section { padding: 68px 0; }
-      .slider { height: 340px; border-radius: 28px; }
+      .slider { min-height: 260px; aspect-ratio: 1 / 1; border-radius: 28px; }
       .slider-arrow { width: 42px; height: 42px; }
       .slider-arrow.prev { left: 10px; }
       .slider-arrow.next { right: 10px; }
@@ -726,7 +728,6 @@
         <div class="section-head">
           <div>
             <span class="pill">🦴 Hizmetler</span>
-            <h2>İhtiyacınıza göre şekillenen destek alanları</h2>
           </div>
         </div>
 
@@ -875,15 +876,18 @@
     const dots = Array.from(document.querySelectorAll('.slider-dot'));
     const prevButton = document.getElementById('prevSlide');
     const nextButton = document.getElementById('nextSlide');
+
     let currentSlide = 0;
     let autoPlay;
 
     function showSlide(index) {
       const safeIndex = (index + slides.length) % slides.length;
-      sliderTrack.style.transform = `translateX(-${safeIndex * 100}%)`;
+      sliderTrack.style.transform = `translateX(-${safeIndex * (100 / slides.length)}%)`;
+
       dots.forEach((dot, i) => {
         dot.classList.toggle('active', i === safeIndex);
       });
+
       currentSlide = safeIndex;
     }
 
@@ -903,22 +907,6 @@
     nextButton.addEventListener('click', () => {
       nextSlide();
       restartAutoPlay();
-    });
-
-    prevButton.addEventListener('click', () => {
-      prevSlide();
-      restartAutoPlay();
-    });
-
-    dots.forEach((dot, index) => {
-      dot.addEventListener('click', () => {
-        showSlide(index);
-        restartAutoPlay();
-      });
-    });
-
-    showSlide(0);
-    restartAutoPlay();
     });
 
     prevButton.addEventListener('click', () => {
