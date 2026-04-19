@@ -630,29 +630,15 @@
       <div class="container hero-layout">
         <div class="slider" id="heroSlider">
           <div class="slide active">
-            <img src="images/hero-1.jpg"   />
+            <img src="images/hero-1.jpg" alt="Köpek eğitimi görseli 1" />
           </div>
 
           <div class="slide">
-            <img src="images/hero-2.jpg"   />
+            <img src="images/hero-2.jpg" alt="Köpek eğitimi görseli 2" />
           </div>
 
           <div class="slide">
-            <img src="images/hero-3.jpg" />
-          </div>
-
-          <div class="slide">
-            <img src="images/hero-4.jpg"  />
-          </div>
-
-          <div class="slide">
-            <img src="images/hero-5.jpg"  />
-          </div>
-
-          <div class="slide">
-            <video autoplay muted loop playsinline>
-              <source src="images/hero-video.mp4" type="video/mp4" />
-            </video>
+            <img src="images/hero-3.jpg" alt="Köpek eğitimi görseli 3" />
           </div>
 
           <button class="slider-arrow prev" id="prevSlide" aria-label="Önceki fotoğraf">‹</button>
@@ -662,9 +648,6 @@
             <button class="slider-dot active" aria-label="1. görsel"></button>
             <button class="slider-dot" aria-label="2. görsel"></button>
             <button class="slider-dot" aria-label="3. görsel"></button>
-            <button class="slider-dot" aria-label="4. görsel"></button>
-            <button class="slider-dot" aria-label="5. görsel"></button>
-            <button class="slider-dot" aria-label="6. görsel"></button>
           </div>
         </div>
 
@@ -891,29 +874,25 @@
     let autoPlay;
 
     function showSlide(index) {
+      const safeIndex = (index + slides.length) % slides.length;
+
       slides.forEach((slide, i) => {
-        const isActive = i === index;
-        slide.classList.toggle('active', isActive);
-        const video = slide.querySelector('video');
-        if (video) {
-          if (isActive) {
-            video.currentTime = 0;
-            video.play().catch(() => {});
-          } else {
-            video.pause();
-          }
-        }
+        slide.classList.toggle('active', i === safeIndex);
       });
-      dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
-      currentSlide = index;
+
+      dots.forEach((dot, i) => {
+        dot.classList.toggle('active', i === safeIndex);
+      });
+
+      currentSlide = safeIndex;
     }
 
     function nextSlide() {
-      showSlide((currentSlide + 1) % slides.length);
+      showSlide(currentSlide + 1);
     }
 
     function prevSlide() {
-      showSlide((currentSlide - 1 + slides.length) % slides.length);
+      showSlide(currentSlide - 1);
     }
 
     function restartAutoPlay() {
@@ -939,21 +918,6 @@
     });
 
     showSlide(0);
-    restartAutoPlay();
-    });
-
-    prevButton.addEventListener('click', () => {
-      prevSlide();
-      restartAutoPlay();
-    });
-
-    dots.forEach((dot, index) => {
-      dot.addEventListener('click', () => {
-        showSlide(index);
-        restartAutoPlay();
-      });
-    });
-
     restartAutoPlay();
   </script>
 </body>
