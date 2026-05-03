@@ -956,35 +956,20 @@
           <div class="review-form-card">
             <span class="pill">✍️ Yorum Yaz</span>
             <h3>Görüşünü bırak</h3>
-            <p class="note">Bu statik demo sürümde yorumlar ziyaretçinin kendi tarayıcısında saklanır. Canlı sitede herkesin görmesi için backend veya Google Form bağlantısı gerekir.</p>
+            <p class="note">Yorumlar Google Form ile toplanır. Google Sheets CSV bağlantısını aşağıdaki JavaScript ayarına eklediğinde onaylanan yorumlar bu alanda otomatik görünür.</p>
 
-            <form id="reviewForm">
-              <label>
-                Ad Soyad
-                <input type="text" id="reviewName" placeholder="Adınızı yazın" required />
-              </label>
+            <a 
+              class="btn btn-primary" 
+              id="googleReviewFormLink"
+              href="GOOGLE_FORM_LINKINI_BURAYA_YAPISTIR" 
+              target="_blank" 
+              rel="noopener noreferrer">
+              Google Form ile Yorum Yaz
+            </a>
 
-              <label>
-                Köpeğiniz / Eğitim konusu
-                <input type="text" id="reviewDog" placeholder="Örn: Rex · Temel itaat" required />
-              </label>
-
-              <label>
-                Puan
-                <div class="rating-options" role="radiogroup" aria-label="Puan seçimi">
-                  <label><input type="radio" name="rating" value="5" checked /><span>5★</span></label>
-                  <label><input type="radio" name="rating" value="4" /><span>4★</span></label>
-                  <label><input type="radio" name="rating" value="3" /><span>3★</span></label>
-                </div>
-              </label>
-
-              <label>
-                Yorumunuz
-                <textarea id="reviewText" placeholder="Deneyiminizi kısaca yazın" required></textarea>
-              </label>
-
-              <button class="btn btn-primary" type="submit">Yorumu Ekle</button>
-            </form>
+            <p class="note">
+              Form cevaplarını Google Sheets’e bağlayıp, sadece yayınlamak istediğin yorumları “Approved” olarak işaretleyebilirsin.
+            </p>
           </div>
         </div>
       </div>
@@ -1134,12 +1119,43 @@
     restartAutoPlay();
 
 
-    const reviewForm = document.getElementById('reviewForm');
+
+
+    /*
+      GOOGLE FORM + GOOGLE SHEETS YORUM AYARI
+
+      1) Google Form oluştur.
+      Alanları şu sırayla yapmanı öneririm:
+         Timestamp | Ad Soyad | Köpeğiniz / Eğitim Konusu | Puan | Yorum | Approved
+
+      2) Form cevaplarını Google Sheets'e bağla.
+
+      3) Google Sheets'te sadece sitede görünmesini istediğin yorumlarda
+         Approved kolonuna TRUE yaz.
+
+      4) Google Sheets:
+         File / Dosya → Share / Paylaş → Publish to web / Web'de yayınla
+         Format: CSV
+         Linki kopyala.
+
+      5) Aşağıdaki GOOGLE_SHEET_CSV_URL içine yapıştır.
+
+      Not:
+      Google Sheets kolon sırası farklıysa parseGoogleSheetRow fonksiyonunda indeksleri değiştirmen gerekir.
+    */
+
+    const GOOGLE_FORM_URL = 'GOOGLE_FORM_LINKINI_BURAYA_YAPISTIR';
+    const GOOGLE_SHEET_CSV_URL = 'GOOGLE_SHEETS_CSV_LINKINI_BURAYA_YAPISTIR';
+
+    const googleReviewFormLink = document.getElementById('googleReviewFormLink');
     const reviewsList = document.getElementById('reviewsList');
-    const reviewsStorageKey = 'k9-working-dog-reviews';
+
+    if (googleReviewFormLink && GOOGLE_FORM_URL && !GOOGLE_FORM_URL.includes('BURAYA_YAPISTIR')) {
+      googleReviewFormLink.href = GOOGLE_FORM_URL;
+    }
 
     function escapeHtml(value) {
-      return value
+      return String(value || '')
         .replaceAll('&', '&amp;')
         .replaceAll('<', '&lt;')
         .replaceAll('>', '&gt;')
@@ -1147,20 +1163,63 @@
         .replaceAll("'", '&#039;');
     }
 
-    function getStoredReviews() {
-      try {
-        return JSON.parse(localStorage.getItem(reviewsStorageKey)) || [];
-      } catch (error) {
-        return [];
+    function parseCsvLine(line) {
+      const result = [];
+      let current = '';
+      let insideQuotes = false;
+
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        const nextChar = line[i + 1];
+
+        if (char === '"' && insideQuotes && nextChar === '"') {
+          current += '"';
+          i++;
+        } else if (char === '"') {
+          insideQuotes = !insideQuotes;
+        } else if (char === ',' && !insideQuotes) {
+          result.push(current);
+          current = '';
+        } else {
+          current += char;
+        }
       }
+
+      result.push(current);
+      return result;
     }
 
-    function saveReviews(reviews) {
-      localStorage.setItem(reviewsStorageKey, JSON.stringify(reviews));
+    function parseCsv(csvText) {
+      return csvText
+        .trim()
+        .split(/\r?\n/)
+        .map(parseCsvLine);
+    }
+
+    function parseGoogleSheetRow(row) {
+      /*
+        Varsayılan kolon sırası:
+        0 Timestamp
+        1 Ad Soyad
+        2 Köpeğiniz / Eğitim Konusu
+        3 Puan
+        4 Yorum
+        5 Approved
+      */
+      return {
+        date: row[0] || '',
+        name: row[1] || '',
+        dog: row[2] || '',
+        rating: row[3] || '5',
+        text: row[4] || '',
+        approved: String(row[5] || '').toLowerCase()
+      };
     }
 
     function createReviewCard(review) {
-      const stars = '★'.repeat(Number(review.rating || 5));
+      const rating = Math.max(1, Math.min(5, Number(review.rating || 5)));
+      const stars = '★'.repeat(rating);
+
       const article = document.createElement('article');
       article.className = 'review-card';
       article.innerHTML = `
@@ -1169,7 +1228,7 @@
             <div class="review-name">${escapeHtml(review.name)}</div>
             <div class="review-dog">${escapeHtml(review.dog)}</div>
           </div>
-          <div class="review-stars" aria-label="${escapeHtml(String(review.rating))} yıldız">${stars}</div>
+          <div class="review-stars" aria-label="${rating} yıldız">${stars}</div>
         </div>
         <p class="review-text">${escapeHtml(review.text)}</p>
         <div class="review-date">${escapeHtml(review.date)}</div>
@@ -1177,45 +1236,37 @@
       return article;
     }
 
-    function renderStoredReviews() {
-      const reviews = getStoredReviews();
-      reviews.forEach(review => {
-        reviewsList.prepend(createReviewCard(review));
-      });
+    async function loadGoogleReviews() {
+      if (!reviewsList) return;
+
+      if (!GOOGLE_SHEET_CSV_URL || GOOGLE_SHEET_CSV_URL.includes('BURAYA_YAPISTIR')) {
+        return;
+      }
+
+      try {
+        const response = await fetch(GOOGLE_SHEET_CSV_URL);
+        const csvText = await response.text();
+        const rows = parseCsv(csvText).slice(1);
+
+        const reviews = rows
+          .map(parseGoogleSheetRow)
+          .filter(review => {
+            const approved = review.approved === 'true' || review.approved === 'evet' || review.approved === 'yes' || review.approved === '1';
+            return approved && review.name && review.text;
+          });
+
+        if (reviews.length === 0) return;
+
+        reviewsList.innerHTML = '';
+        reviews.reverse().forEach(review => {
+          reviewsList.appendChild(createReviewCard(review));
+        });
+      } catch (error) {
+        console.warn('Yorumlar yüklenemedi:', error);
+      }
     }
 
-    if (reviewForm && reviewsList) {
-      renderStoredReviews();
-
-      reviewForm.addEventListener('submit', event => {
-        event.preventDefault();
-
-        const ratingInput = reviewForm.querySelector('input[name="rating"]:checked');
-        const review = {
-          name: document.getElementById('reviewName').value.trim(),
-          dog: document.getElementById('reviewDog').value.trim(),
-          rating: ratingInput ? ratingInput.value : '5',
-          text: document.getElementById('reviewText').value.trim(),
-          date: new Date().toLocaleDateString('tr-TR')
-        };
-
-        if (!review.name || !review.dog || !review.text) {
-          alert('Lütfen tüm alanları doldurun.');
-          return;
-        }
-
-        const reviews = getStoredReviews();
-        reviews.push(review);
-        saveReviews(reviews);
-
-        reviewsList.prepend(createReviewCard(review));
-        reviewForm.reset();
-        const defaultRating = reviewForm.querySelector('input[name="rating"][value="5"]');
-        if (defaultRating) defaultRating.checked = true;
-
-        alert('Yorumunuz eklendi. Teşekkürler!');
-      });
-    }
+    loadGoogleReviews();
 
   </script>
 </body>
