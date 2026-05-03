@@ -533,6 +533,106 @@
       color: var(--muted);
     }
 
+
+    .reviews-grid {
+      display: grid;
+      grid-template-columns: 1fr 0.85fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .reviews-list {
+      display: grid;
+      gap: 16px;
+    }
+
+    .review-card {
+      background: linear-gradient(180deg, #ffffff, #fbfaf7);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      border-radius: 26px;
+      padding: 22px;
+    }
+
+    .review-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: start;
+      margin-bottom: 10px;
+    }
+
+    .review-name {
+      font-weight: 900;
+      color: var(--khaki-5);
+    }
+
+    .review-dog {
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin-top: 2px;
+    }
+
+    .review-stars {
+      color: #9a7c2f;
+      letter-spacing: 1px;
+      white-space: nowrap;
+    }
+
+    .review-text {
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .review-date {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+
+    .review-form-card {
+      background: linear-gradient(180deg, #ffffff, #fbfaf7);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius-xl);
+      padding: 30px;
+      position: sticky;
+      top: 100px;
+    }
+
+    .rating-options {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .rating-options input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .rating-options span {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 48px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: white;
+      cursor: pointer;
+      transition: 0.2s ease;
+      font-weight: 800;
+      color: var(--muted);
+    }
+
+    .rating-options input:checked + span {
+      background: var(--khaki-4);
+      color: white;
+      border-color: var(--khaki-4);
+    }
+
     .footer {
       padding: 34px 0 44px;
       color: var(--muted);
@@ -577,8 +677,13 @@
     @media (max-width: 980px) {
       .about-wrap,
       .contact-wrap,
+      .reviews-grid,
       .service-card {
         grid-template-columns: 1fr;
+      }
+
+      .review-form-card {
+        position: static;
       }
 
       .slider { height: 380px; }
@@ -635,6 +740,7 @@
         <a href="#home">Anasayfa</a>
         <a href="#about">Hakkımda</a>
         <a href="#services">Hizmetler</a>
+        <a href="#reviews">Yorumlar</a>
         <a href="#contact">İletişim</a>
       </nav>
     </div>
@@ -809,6 +915,81 @@
     </div>
     </section>
 
+
+    <section class="section" id="reviews">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <span class="pill">⭐ Yorumlar</span>
+            <h2>Deneyimini paylaş</h2>
+            <p class="lead">Eğitim sürecinden memnun kaldıysan kısa bir yorum bırakabilirsin. Yeni gelen yorumlar bu sayfada listelenir.</p>
+          </div>
+        </div>
+
+        <div class="reviews-grid">
+          <div class="reviews-list" id="reviewsList">
+            <article class="review-card">
+              <div class="review-top">
+                <div>
+                  <div class="review-name">Ayşe K.</div>
+                  <div class="review-dog">Luna · Yavru köpek eğitimi</div>
+                </div>
+                <div class="review-stars" aria-label="5 yıldız">★★★★★</div>
+              </div>
+              <p class="review-text">İlk görüşmeden itibaren çok net ve güven veren bir süreçti. Evde uygulayabileceğimiz pratik öneriler sayesinde kısa sürede düzen oturdu.</p>
+              <div class="review-date">Örnek yorum</div>
+            </article>
+
+            <article class="review-card">
+              <div class="review-top">
+                <div>
+                  <div class="review-name">Mert S.</div>
+                  <div class="review-dog">Max · Temel itaat</div>
+                </div>
+                <div class="review-stars" aria-label="5 yıldız">★★★★★</div>
+              </div>
+              <p class="review-text">Tasma yürüyüşünde çok zorlanıyorduk. Eğitimden sonra Max çok daha kontrollü ve sakin yürümeye başladı.</p>
+              <div class="review-date">Örnek yorum</div>
+            </article>
+          </div>
+
+          <div class="review-form-card">
+            <span class="pill">✍️ Yorum Yaz</span>
+            <h3>Görüşünü bırak</h3>
+            <p class="note">Bu statik demo sürümde yorumlar ziyaretçinin kendi tarayıcısında saklanır. Canlı sitede herkesin görmesi için backend veya Google Form bağlantısı gerekir.</p>
+
+            <form id="reviewForm">
+              <label>
+                Ad Soyad
+                <input type="text" id="reviewName" placeholder="Adınızı yazın" required />
+              </label>
+
+              <label>
+                Köpeğiniz / Eğitim konusu
+                <input type="text" id="reviewDog" placeholder="Örn: Rex · Temel itaat" required />
+              </label>
+
+              <label>
+                Puan
+                <div class="rating-options" role="radiogroup" aria-label="Puan seçimi">
+                  <label><input type="radio" name="rating" value="5" checked /><span>5★</span></label>
+                  <label><input type="radio" name="rating" value="4" /><span>4★</span></label>
+                  <label><input type="radio" name="rating" value="3" /><span>3★</span></label>
+                </div>
+              </label>
+
+              <label>
+                Yorumunuz
+                <textarea id="reviewText" placeholder="Deneyiminizi kısaca yazın" required></textarea>
+              </label>
+
+              <button class="btn btn-primary" type="submit">Yorumu Ekle</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section class="section" id="contact">
       <div class="container contact-wrap">
         <div class="contact-card">
@@ -951,6 +1132,91 @@
 
     showSlide(0);
     restartAutoPlay();
+
+
+    const reviewForm = document.getElementById('reviewForm');
+    const reviewsList = document.getElementById('reviewsList');
+    const reviewsStorageKey = 'k9-working-dog-reviews';
+
+    function escapeHtml(value) {
+      return value
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function getStoredReviews() {
+      try {
+        return JSON.parse(localStorage.getItem(reviewsStorageKey)) || [];
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function saveReviews(reviews) {
+      localStorage.setItem(reviewsStorageKey, JSON.stringify(reviews));
+    }
+
+    function createReviewCard(review) {
+      const stars = '★'.repeat(Number(review.rating || 5));
+      const article = document.createElement('article');
+      article.className = 'review-card';
+      article.innerHTML = `
+        <div class="review-top">
+          <div>
+            <div class="review-name">${escapeHtml(review.name)}</div>
+            <div class="review-dog">${escapeHtml(review.dog)}</div>
+          </div>
+          <div class="review-stars" aria-label="${escapeHtml(String(review.rating))} yıldız">${stars}</div>
+        </div>
+        <p class="review-text">${escapeHtml(review.text)}</p>
+        <div class="review-date">${escapeHtml(review.date)}</div>
+      `;
+      return article;
+    }
+
+    function renderStoredReviews() {
+      const reviews = getStoredReviews();
+      reviews.forEach(review => {
+        reviewsList.prepend(createReviewCard(review));
+      });
+    }
+
+    if (reviewForm && reviewsList) {
+      renderStoredReviews();
+
+      reviewForm.addEventListener('submit', event => {
+        event.preventDefault();
+
+        const ratingInput = reviewForm.querySelector('input[name="rating"]:checked');
+        const review = {
+          name: document.getElementById('reviewName').value.trim(),
+          dog: document.getElementById('reviewDog').value.trim(),
+          rating: ratingInput ? ratingInput.value : '5',
+          text: document.getElementById('reviewText').value.trim(),
+          date: new Date().toLocaleDateString('tr-TR')
+        };
+
+        if (!review.name || !review.dog || !review.text) {
+          alert('Lütfen tüm alanları doldurun.');
+          return;
+        }
+
+        const reviews = getStoredReviews();
+        reviews.push(review);
+        saveReviews(reviews);
+
+        reviewsList.prepend(createReviewCard(review));
+        reviewForm.reset();
+        const defaultRating = reviewForm.querySelector('input[name="rating"][value="5"]');
+        if (defaultRating) defaultRating.checked = true;
+
+        alert('Yorumunuz eklendi. Teşekkürler!');
+      });
+    }
+
   </script>
 </body>
 </html>
